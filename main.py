@@ -23,14 +23,15 @@ def main():
         print("No images found in the image folder!")
         return
     
-    # Ensure we have at least 2 images, duplicate if needed
-    if len(available_images) == 1:
-        available_images.append(available_images[0])  # Use same image twice if only one exists
+    # Ensure we have images to work with
+    if len(available_images) == 0:
+        print("No images found in the image folder!")
+        return
     
-    print(f"Available images: {[os.path.basename(img) for img in available_images[:2]]}")
+    print(f"Found {len(available_images)} images: {[os.path.basename(img) for img in available_images]}")
     
-    # Run the application with multiple images
-    ui.run(available_images[:2])  # Pass first 2 images
+    # Run the application with all available images
+    ui.run(available_images)
 
 if __name__ == "__main__":
     main()

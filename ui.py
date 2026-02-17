@@ -15,6 +15,9 @@ from PIL import Image, ImageTk
 import os
 from datetime import datetime
 
+# Import our color processing module
+from colorextract import extract_color, apply_color_filter, get_extraction_colors, get_color_filters
+
 class ColorExtractionUI:
     """
     Main GUI class for Color Extraction Program
@@ -35,46 +38,12 @@ class ColorExtractionUI:
         self.result_image = None           # Processed result image
         self.image_paths = []              # List of available image paths
         self.current_image_index = 0       # Index of currently active image
+        self.image_buttons = []            # List of image selection buttons
         
-        # ==================== COLOR EXTRACTION SETTINGS ====================
-        # HSV color ranges for extracting specific colors from images
-        self.extraction_colors = {
-            'green': {
-                'display_name': 'Green',
-                'button_color': '#4CAF50',
-                'hsv_lower_bound': np.array([40, 50, 50]),   # Lower HSV threshold
-                'hsv_upper_bound': np.array([80, 255, 255])  # Upper HSV threshold
-            },
-            'purple': {
-                'display_name': 'Purple',
-                'button_color': '#9C27B0', 
-                'hsv_lower_bound': np.array([120, 50, 50]),
-                'hsv_upper_bound': np.array([160, 255, 255])
-            },
-            'blue': {
-                'display_name': 'Blue',
-                'button_color': '#2196F3',
-                'hsv_lower_bound': np.array([100, 50, 50]),
-                'hsv_upper_bound': np.array([130, 255, 255])
-            }
-        }
-        
-        # ==================== COLOR FILTER SETTINGS ====================
-        # Color filters for applying tints and effects to entire image  
-        self.color_filters = {
-            'red': {
-                'display_name': 'Red Filter',
-                'button_color': '#f44336'
-            },
-            'yellow': {
-                'display_name': 'Yellow Filter', 
-                'button_color': '#FFEB3B'
-            },
-            'gray': {
-                'display_name': 'Grayscale Filter',
-                'button_color': '#9E9E9E'
-            }
-        }
+        # ==================== COLOR PROCESSING CONFIGURATION ====================
+        # Get color configurations from the colorextract module
+        self.extraction_colors = get_extraction_colors()
+        self.color_filters = get_color_filters()
         
         # ==================== GUI SETUP ====================
         self.setup_main_window()
@@ -87,8 +56,8 @@ class ColorExtractionUI:
     def setup_main_window(self):
         """Configure the main application window"""
         self.root = tk.Tk()
-        self.root.title("Color Extraction Program")
-        self.root.geometry("1000x700")
+        self.root.title("Color Extraction Program - Multi-Image Support")
+        self.root.geometry("1200x800")  # Larger window for multiple images
         self.root.configure(bg='#f0f0f0')
         self.root.resizable(True, True)
         
@@ -116,54 +85,58 @@ class ColorExtractionUI:
         main_title.pack()
     
     def create_image_selection_section(self):
-        """Create image selection buttons and current image indicator"""
+        """Create dynamic image selection interface based on available images"""
         # Container for image selection controls
         self.image_selection_container = tk.Frame(self.root, bg='#f0f0f0')
         self.image_selection_container.pack(pady=10)
         
-        # Current image indicator label
+        # Current image indicator label - will be updated with actual count later
         self.current_image_indicator = tk.Label(
             self.image_selection_container, 
-            text="Current Image: Image 1", 
+            text="Current Image: Loading...", 
             font=('Arial', 14, 'bold'), 
             bg='#f0f0f0', 
             fg='#333'
         )
-        self.current_image_indicator.pack()
+        self.current_image_indicator.pack(pady=5)
         
-        # Container for image switching buttons
-        image_button_container = tk.Frame(self.image_selection_container, bg='#f0f0f0')
-        image_button_container.pack(pady=5)
+        # Container for navigation controls
+        navigation_container = tk.Frame(self.image_selection_container, bg='#f0f0f0')
+        navigation_container.pack(pady=5)
         
-        # Image 1 button - starts active (blue)
-        self.image1_button = tk.Button(
-            image_button_container, 
-            text="📷 Image 1",
-            font=('Arial', 12, 'bold'), 
-            bg='#2196F3',  # Active color 
+        # Previous button
+        self.prev_button = tk.Button(
+            navigation_container,
+            text="← Previous",
+            font=('Arial', 12, 'bold'),
+            bg='#757575',
             fg='white',
-            width=10, 
-            height=1, 
-            relief='flat', 
+            width=12,
+            height=1,
+            relief='flat',
             cursor='hand2',
-            command=lambda: self.switch_to_image(0)
+            command=self.previous_image
         )
-        self.image1_button.pack(side=tk.LEFT, padx=5)
+        self.prev_button.pack(side=tk.LEFT, padx=5)
         
-        # Image 2 button - starts inactive (gray)
-        self.image2_button = tk.Button(
-            image_button_container, 
-            text="📷 Image 2",
-            font=('Arial', 12, 'bold'), 
-            bg='#757575',  # Inactive color
+        # Next button
+        self.next_button = tk.Button(
+            navigation_container,
+            text="Next →",
+            font=('Arial', 12, 'bold'),
+            bg='#757575',
             fg='white',
-            width=10, 
-            height=1, 
-            relief='flat', 
+            width=12,
+            height=1,
+            relief='flat',
             cursor='hand2',
-            command=lambda: self.switch_to_image(1)
+            command=self.next_image
         )
-        self.image2_button.pack(side=tk.LEFT, padx=5)
+        self.next_button.pack(side=tk.LEFT, padx=5)
+        
+        # Container for image selection buttons (will be populated when images are loaded)
+        self.image_buttons_container = tk.Frame(self.image_selection_container, bg='#f0f0f0')
+        self.image_buttons_container.pack(pady=10)
     
     def create_main_action_buttons(self):
         """Create the main Extract Color and Change Color action buttons"""
@@ -198,7 +171,76 @@ class ColorExtractionUI:
             cursor='hand2',
             command=self.show_filter_options
         )
-        self.change_color_button.pack(side=tk.LEFT, padx=10)
+    def setup_image_buttons(self):
+        """Create image selection buttons based on available images"""
+        # Clear existing buttons
+        for widget in self.image_buttons_container.winfo_children():
+            widget.destroy()
+        self.image_buttons.clear()
+        
+        if not self.image_paths:
+            return
+        
+        # Create a button for each image
+        total_images = len(self.image_paths)
+        
+        # Create buttons in rows of 5 for better layout
+        current_row = None
+        for i, image_path in enumerate(self.image_paths):
+            if i % 5 == 0:  # Start a new row every 5 buttons
+                current_row = tk.Frame(self.image_buttons_container, bg='#f0f0f0')
+                current_row.pack(pady=2)
+            
+            # Create button with image name
+            image_name = os.path.splitext(os.path.basename(image_path))[0]
+            button_text = f"{i+1}: {image_name[:8]}..." if len(image_name) > 8 else f"{i+1}: {image_name}"
+            
+            button = tk.Button(
+                current_row,
+                text=button_text,
+                font=('Arial', 9, 'bold'),
+                bg='#757575',  # Inactive color initially
+                fg='white',
+                width=12,
+                height=1,
+                relief='flat',
+                cursor='hand2',
+                command=lambda idx=i: self.switch_to_image(idx)
+            )
+            button.pack(side=tk.LEFT, padx=2)
+            self.image_buttons.append(button)
+        
+        # Update the current image indicator
+        self.update_image_indicator()
+    
+    def update_image_buttons(self):
+        """Update the visual state of image selection buttons"""
+        for i, button in enumerate(self.image_buttons):
+            if i == self.current_image_index:
+                button.config(bg='#2196F3')  # Active - blue
+            else:
+                button.config(bg='#757575')  # Inactive - gray
+    
+    def update_image_indicator(self):
+        """Update the current image indicator text"""
+        total_images = len(self.image_paths)
+        if total_images > 0:
+            current_name = os.path.splitext(os.path.basename(self.image_paths[self.current_image_index]))[0]
+            self.current_image_indicator.config(
+                text=f"Image {self.current_image_index + 1} of {total_images}: {current_name}"
+            )
+    
+    def previous_image(self):
+        """Switch to the previous image"""
+        if len(self.image_paths) > 1:
+            previous_index = (self.current_image_index - 1) % len(self.image_paths)
+            self.switch_to_image(previous_index)
+    
+    def next_image(self):
+        """Switch to the next image"""
+        if len(self.image_paths) > 1:
+            next_index = (self.current_image_index + 1) % len(self.image_paths)
+            self.switch_to_image(next_index)
         
     def create_extraction_controls(self):
         """Create color extraction selection interface (initially hidden)"""
@@ -335,22 +377,17 @@ class ColorExtractionUI:
         Switch between available images
         
         Args:
-            image_index (int): Index of image to switch to (0 for Image 1, 1 for Image 2)
+            image_index (int): Index of image to switch to
         """
-        if image_index < len(self.image_paths):
+        if 0 <= image_index < len(self.image_paths):
             self.current_image_index = image_index
             self.load_current_image()
             
             # Update the current image indicator text
-            self.current_image_indicator.config(text=f"Current Image: Image {image_index + 1}")
+            self.update_image_indicator()
             
-            # Update button appearance (active = blue, inactive = gray)
-            if image_index == 0:
-                self.image1_button.config(bg='#2196F3')  # Active - blue
-                self.image2_button.config(bg='#757575')  # Inactive - gray
-            else:
-                self.image1_button.config(bg='#757575')  # Inactive - gray 
-                self.image2_button.config(bg='#2196F3')  # Active - blue
+            # Update button appearances
+            self.update_image_buttons()
             
             # Hide any open option panels and previous results
             self.hide_extraction_options()
@@ -415,9 +452,10 @@ class ColorExtractionUI:
         
         # Results title
         operation_type = "Filter" if is_filter else "Extraction"
+        current_image_name = os.path.splitext(os.path.basename(self.image_paths[self.current_image_index]))[0]
         results_title = tk.Label(self.results_display_container, 
-                                text=f"✨ {operation_name} {operation_type} Results (Image {self.current_image_index + 1})", 
-                                font=('Arial', 18, 'bold'), bg='#f0f0f0', fg='#333')
+                                text=f"✨ {operation_name} {operation_type} Results\nImage {self.current_image_index + 1} of {len(self.image_paths)}: {current_image_name}", 
+                                font=('Arial', 16, 'bold'), bg='#f0f0f0', fg='#333')
         results_title.pack(pady=10)
         
         # Images container
@@ -466,19 +504,30 @@ class ColorExtractionUI:
                                       command=self.reset_for_new_operation)
         new_operation_btn.pack(side=tk.LEFT, padx=10)
         
-        # Add image switching buttons in results
+        # Add navigation buttons in results for easy image switching
         if len(self.image_paths) > 1:
-            switch_image_btn = tk.Button(action_frame, text=f"📷 Switch to Image {2 if self.current_image_index == 0 else 1}", 
-                                        font=('Arial', 12, 'bold'), bg='#9C27B0', fg='white',
-                                        relief='flat', cursor='hand2', 
-                                        command=lambda: self.switch_to_image(1 - self.current_image_index))
-            switch_image_btn.pack(side=tk.LEFT, padx=10)
+            nav_frame = tk.Frame(action_frame, bg='#f0f0f0')
+            nav_frame.pack(side=tk.LEFT, padx=20)
+            
+            if self.current_image_index > 0:
+                prev_btn = tk.Button(nav_frame, text="← Previous Image", 
+                                    font=('Arial', 10, 'bold'), bg='#9C27B0', fg='white',
+                                    relief='flat', cursor='hand2', 
+                                    command=self.previous_image)
+                prev_btn.pack(side=tk.TOP, pady=2)
+            
+            if self.current_image_index < len(self.image_paths) - 1:
+                next_btn = tk.Button(nav_frame, text="Next Image →", 
+                                    font=('Arial', 10, 'bold'), bg='#9C27B0', fg='white',
+                                    relief='flat', cursor='hand2', 
+                                    command=self.next_image)
+                next_btn.pack(side=tk.TOP, pady=2)
         
         operation_type = "filter" if is_filter else "extraction"
         self.status_label.config(text=f"✅ {operation_name} {operation_type} completed successfully!", fg='#4CAF50')
     
     def apply_color_filter(self, filter_key):
-        """Apply color filter to the image"""
+        """Apply color filter using colorextract module"""
         if filter_key not in self.color_filters:
             messagebox.showerror("Error", "Invalid filter selection!")
             return False
@@ -491,30 +540,14 @@ class ColorExtractionUI:
         self.show_progress(f"Applying {filter_info['display_name']}...")
         
         try:
-            if filter_key == 'gray':
-                # Convert to complete grayscale
-                gray = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2GRAY)
-                self.result_image = cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
-            elif filter_key == 'red':
-                # Apply red filter - enhance red channel, reduce green/blue
-                self.result_image = self.current_image.astype(np.float32)
-                self.result_image[:, :, 0] *= 0.6   # Blue channel - reduce
-                self.result_image[:, :, 1] *= 0.6   # Green channel - reduce  
-                self.result_image[:, :, 2] *= 1.5   # Red channel - enhance
-                self.result_image = np.clip(self.result_image, 0, 255).astype(np.uint8)
-            elif filter_key == 'yellow':
-                # Apply yellow filter - enhance red/green channels, reduce blue
-                self.result_image = self.current_image.astype(np.float32)
-                self.result_image[:, :, 0] *= 0.5   # Blue channel - reduce significantly
-                self.result_image[:, :, 1] *= 1.3   # Green channel - enhance  
-                self.result_image[:, :, 2] *= 1.3   # Red channel - enhance
-                self.result_image = np.clip(self.result_image, 0, 255).astype(np.uint8)
-            else:
-                # Fallback - just copy the current image
-                self.result_image = self.current_image.copy()
+            # Use the colorextract module function
+            self.result_image, filter_display_name = apply_color_filter(
+                self.current_image, 
+                filter_key
+            )
             
             self.hide_progress()
-            self.display_results(filter_info['display_name'], is_filter=True)
+            self.display_results(filter_display_name, is_filter=True)
             return True
             
         except Exception as e:
@@ -620,7 +653,8 @@ class ColorExtractionUI:
             self.hsv_image = cv2.cvtColor(self.current_image, cv2.COLOR_BGR2HSV)
             
             image_name = os.path.basename(image_path)
-            self.status_label.config(text=f"✅ Image loaded: {image_name} (Image {self.current_image_index + 1})", fg='#4CAF50')
+            total_images = len(self.image_paths)
+            self.status_label.config(text=f"✅ Image loaded: {image_name} (Image {self.current_image_index + 1} of {total_images})", fg='#4CAF50')
             return True
         except Exception as e:
             self.status_label.config(text=f"❌ Failed to load image: {str(e)}", fg='#f44336')
@@ -629,12 +663,7 @@ class ColorExtractionUI:
     
     def perform_color_extraction(self, color_key):
         """
-        Extract specified color from image and make everything else gray
-        
-        This method:
-        1. Creates a mask for the selected color in HSV space
-        2. Keeps the original color where mask matches
-        3. Makes everything else a neutral gray
+        Extract specified color from image using colorextract module
         
         Args:
             color_key (str): Key identifying which color to extract ('green', 'purple', 'blue')
@@ -654,33 +683,15 @@ class ColorExtractionUI:
         self.show_progress(f"Extracting {color_info['display_name']} color...")
         
         try:
-            # Create mask for the selected color using HSV thresholds
-            lower_hsv = color_info['hsv_lower_bound']
-            upper_hsv = color_info['hsv_upper_bound']
-            
-            mask = cv2.inRange(self.hsv_image, lower_hsv, upper_hsv)
-            
-            # Apply morphological operations to clean up the mask
-            kernel = np.ones((3,3), np.uint8)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-            mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-            
-            # Create neutral gray background
-            gray_background = np.full_like(self.current_image, (128, 128, 128), dtype=np.uint8)
-            
-            # Create the result image: keep original color where mask matches, gray elsewhere
-            self.result_image = self.current_image.copy()
-            
-            # Convert mask to 3-channel
-            mask_3channel = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-            mask_normalized = mask_3channel.astype(float) / 255
-            
-            # Apply the effect: keep original where mask is white, use gray where mask is black
-            self.result_image = (self.result_image * mask_normalized + 
-                               gray_background * (1 - mask_normalized)).astype(np.uint8)
+            # Use the colorextract module function
+            self.result_image, color_display_name = extract_color(
+                self.current_image, 
+                self.hsv_image, 
+                color_key
+            )
             
             self.hide_progress()
-            self.display_results(color_info['display_name'])
+            self.display_results(color_display_name)
             return True
             
         except Exception as e:
@@ -702,7 +713,14 @@ class ColorExtractionUI:
         """Start the GUI application with the provided images"""
         try:
             self.image_paths = image_paths
+            
+            # Set up image selection buttons now that we have the paths
+            self.setup_image_buttons()
+            
             if self.load_current_image():
+                # Update image buttons to show current selection
+                self.update_image_buttons()
+                
                 # Center the window
                 self.root.update_idletasks()
                 width = self.root.winfo_width()
