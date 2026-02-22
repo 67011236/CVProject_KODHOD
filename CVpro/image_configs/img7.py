@@ -1,18 +1,8 @@
-# ============================================================================
-#                        IMAGE CONFIG — 7.jpg
-# ============================================================================
-# Edit ONLY this file when working on image 7 (7.jpg).
-# Do NOT edit ui.py or colorextract.py for per-image customisation.
-# ============================================================================
-
 CONFIG = {
-    # ── Extraction page: which color buttons to show ─────────────────────────
     'extract_colors': ['black', 'red'],
 
-    # ── Filter (Change Mood) page: which filter buttons to show ──────────────
     'filter_colors': ['red', 'yellow', 'gray'],
 
-    # ── Cinematic descriptions for each extraction color ─────────────────────
     'extract_descriptions': {
         'black': (
             "Cinematic Emotion",
@@ -28,7 +18,6 @@ CONFIG = {
         ),
     },
 
-    # ── Cinematic descriptions for each filter ────────────────────────────────
     'filter_descriptions': {
         'red': (
             "Cinematic Emotion",
