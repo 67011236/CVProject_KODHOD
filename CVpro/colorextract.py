@@ -25,7 +25,7 @@ class ColorConfig:
         },
         'purple': {
             'display_name': 'Purple',
-            'button_color': '#9C27B0', 
+            'button_color': '#673AB7', 
             'hsv_lower_bound': np.array([120, 50, 50]),
             'hsv_upper_bound': np.array([160, 255, 255])
         },

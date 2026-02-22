@@ -618,11 +618,11 @@ class ColorExtractionUI:
         # Format: (title, body)
         DESCRIPTIONS = {
             0: {
-                'green':  ("Cinematic Emotion:  Social Alienation",
+                'green':  ("Cinematic Emotion",
                            "This unnatural green shade represents the character's detachment from society. "
                            "It creates a sense of unease and isolation, highlighting a world where the individual "
                            "feels like an outsider in their own environment."),
-                'purple': ("Cinematic Emotion:  Urban Melancholy",
+                'purple': ("Cinematic Emotion",
                            "A somber, low-luminance tone that evokes a feeling of nostalgia and loneliness. "
                            "When paired with green, it creates visual tension that reflects the quiet sadness "
                            "and solitude of life in a vast, empty city."),
