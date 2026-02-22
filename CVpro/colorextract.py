@@ -24,10 +24,10 @@ class ColorConfig:
             'hsv_upper_bound': np.array([85, 255, 255])  # รวมเขียวเหลือง เขียวน้ำเงิน
         },
         'purple': {
-            'display_name': 'Purple',
-            'button_color': '#673AB7', 
-            'hsv_lower_bound': np.array([120, 50, 50]),
-            'hsv_upper_bound': np.array([160, 255, 255])
+            'display_name': 'Pink',
+            'button_color': '#E91E63', 
+            'hsv_lower_bound': np.array([125, 30, 30]),  # ขยายช่วงเพื่อจับสีม่วงทุกเฉดให้ชัดเจน
+            'hsv_upper_bound': np.array([165, 255, 255]) # ครอบคลุมทั้งม่วงแดงและม่วงน้ำเงิน
         },
         'blue': {
             'display_name': 'Blue',
@@ -84,6 +84,13 @@ class ColorConfig:
             'blue_multiplier': 1.8,    # Enhance blue channel
             'green_multiplier': 0.6,   # Reduce green
             'red_multiplier': 0.5      # Reduce red
+        },
+        'purple': {
+            'display_name': 'Purple Filter',
+            'button_color': '#673AB7',
+            'blue_multiplier': 1.5,    # Enhance blue channel
+            'green_multiplier': 0.6,   # Reduce green
+            'red_multiplier': 1.4      # Enhance red to create purple
         }
     }
     
