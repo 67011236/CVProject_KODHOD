@@ -433,6 +433,7 @@ class ColorExtractionUI:
         res_outer = tk.Frame(panels, bg='#1e1e1e')
         res_outer.grid(row=0, column=1, sticky='nsew', padx=8)
         res_outer.rowconfigure(1, weight=1)
+        res_outer.rowconfigure(2, weight=0)  # Fixed height for description area
         res_outer.columnconfigure(0, weight=1)
         tk.Label(res_outer, textvariable=res_title_var, font=(FONT, 13, 'bold'),
                  bg='#1e1e1e', fg=TEXT_PRI).grid(row=0, column=0, sticky='w', padx=14, pady=(12, 8))
@@ -440,9 +441,14 @@ class ColorExtractionUI:
                            font=(FONT, 10, 'italic'), fg=TEXT_HINT, anchor='center')
         res_lbl.grid(row=1, column=0, sticky='nsew', padx=10, pady=(0, 12))
 
-        # ── Cinematic description card (filter page) ──────────────────────
-        desc_card_f = tk.Frame(res_outer, bg='#141414')
-        desc_card_f.grid(row=2, column=0, sticky='ew', padx=12, pady=(0, 14))
+        # ── Cinematic description card (filter page) with fixed height ────────
+        desc_container_f = tk.Frame(res_outer, bg='#1e1e1e', height=160)
+        desc_container_f.grid(row=2, column=0, sticky='ew', padx=12, pady=(0, 14))
+        desc_container_f.grid_propagate(False)  # Maintain fixed height
+        desc_container_f.columnconfigure(0, weight=1)
+        
+        desc_card_f = tk.Frame(desc_container_f, bg='#141414')
+        desc_card_f.grid(row=0, column=0, sticky='ew')
         desc_card_f.columnconfigure(0, weight=1)
         tk.Frame(desc_card_f, bg=ACCENT, height=3).grid(row=0, column=0, sticky='ew')
         inner_f = tk.Frame(desc_card_f, bg='#141414')
@@ -452,7 +458,7 @@ class ColorExtractionUI:
                                 font=(FONT, 13, 'bold'), anchor='w', justify='left')
         desc_title_f.grid(row=0, column=0, sticky='ew', pady=(0, 10))
         desc_body_f = tk.Label(inner_f, text='', bg='#141414', fg='#e0e0e0',
-                               font=(FONT, 11), anchor='w', justify='left', wraplength=520)
+                               font=(FONT, 11), anchor='w', justify='left', wraplength=400)
         desc_body_f.grid(row=1, column=0, sticky='ew')
         desc_card_f.grid_remove()
         sv = tk.StringVar(value="Select a filter to apply")
@@ -568,6 +574,7 @@ class ColorExtractionUI:
         res_outer = tk.Frame(panels, bg='#1e1e1e')
         res_outer.grid(row=0, column=1, sticky='nsew', padx=8)
         res_outer.rowconfigure(1, weight=1)
+        res_outer.rowconfigure(2, weight=0)  # Fixed height for description area
         res_outer.columnconfigure(0, weight=1)
         tk.Label(res_outer, textvariable=res_title_var, font=(FONT, 13, 'bold'),
                  bg='#1e1e1e', fg=TEXT_PRI).grid(row=0, column=0, sticky='w', padx=14, pady=(12, 8))
@@ -576,9 +583,14 @@ class ColorExtractionUI:
                            font=(FONT, 10, 'italic'), fg=TEXT_HINT, anchor='center')
         res_lbl.grid(row=1, column=0, sticky='nsew', padx=10, pady=(0, 4))
 
-        # ── Cinematic description card ────────────────────────────────────────
-        desc_card = tk.Frame(res_outer, bg='#141414')
-        desc_card.grid(row=2, column=0, sticky='ew', padx=12, pady=(0, 14))
+        # ── Cinematic description card with fixed height ───────────────────────
+        desc_container = tk.Frame(res_outer, bg='#1e1e1e', height=160)
+        desc_container.grid(row=2, column=0, sticky='ew', padx=12, pady=(0, 14))
+        desc_container.grid_propagate(False)  # Maintain fixed height
+        desc_container.columnconfigure(0, weight=1)
+        
+        desc_card = tk.Frame(desc_container, bg='#141414')
+        desc_card.grid(row=0, column=0, sticky='ew')
         desc_card.columnconfigure(0, weight=1)
 
         # Top accent bar
@@ -594,7 +606,7 @@ class ColorExtractionUI:
 
         desc_body_lbl = tk.Label(inner_pad, text='', bg='#141414', fg='#e0e0e0',
                                  font=(FONT, 11), anchor='w', justify='left',
-                                 wraplength=520)
+                                 wraplength=400)  # Reduced wraplength to fit in fixed height
         desc_body_lbl.grid(row=1, column=0, sticky='ew')
 
         desc_card.grid_remove()  # hidden until a color is chosen

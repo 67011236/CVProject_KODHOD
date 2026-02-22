@@ -40,6 +40,12 @@ class ColorConfig:
             'button_color': '#333333',
             'hsv_lower_bound': np.array([0, 0, 0]),
             'hsv_upper_bound': np.array([180, 255, 50])
+        },
+        'yellow': {
+            'display_name': 'Yellow',
+            'button_color': '#FFEB3B',
+            'hsv_lower_bound': np.array([10, 50, 50]),     # Wider hue range, lower saturation threshold
+            'hsv_upper_bound': np.array([40, 255, 255])    # Extended to include yellow-orange tones
         }
     }
     
