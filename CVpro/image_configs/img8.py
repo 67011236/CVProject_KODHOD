@@ -1,5 +1,5 @@
 CONFIG = {
-    'extract_colors': ['green', 'purple'],
+    'extract_colors': ['green', 'pink'],
 
     'filter_colors': ['red', 'blue', 'gray'],
 
@@ -10,7 +10,7 @@ CONFIG = {
             "This makes the scene feel mysterious, magical, and slightly intense because the green tones "
             "emphasize the darker fantasy side of the image and the contrast between the witch and the environment.",
         ),
-        'purple': (
+        'pink': (
             "Cinematic Emotion",
             "Pink extraction highlights the princess's dress, cherry blossoms, and soft pink flowers on the "
             "left side. This creates a warm, gentle, and dreamy mood, making the scene feel more elegant "

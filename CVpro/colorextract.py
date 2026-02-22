@@ -47,6 +47,12 @@ class ColorConfig:
             'button_color': '#FAFAFA',
             'hsv_lower_bound': np.array([0, 0, 180]),
             'hsv_upper_bound': np.array([180, 40, 255])
+        },
+        'pink': {
+            'display_name': 'Pink',
+            'button_color': '#E91E63',
+            'hsv_lower_bound': np.array([140, 20, 50]),
+            'hsv_upper_bound': np.array([180, 255, 255])
         }
     }
     

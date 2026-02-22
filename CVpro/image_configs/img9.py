@@ -1,22 +1,22 @@
 CONFIG = {
-    'extract_colors': ['purple', 'yellow'],
+    'extract_colors': ['yellow', 'pink'],
 
     'filter_colors': ['red', 'yellow', 'gray'],
 
     'extract_descriptions': {
-        'purple': (
-            "Cinematic Emotion",
-            "The pink color creates a soft but slightly surreal atmosphere. It feels playful and sweet "
-            "at first, but because it covers large areas of the scene, it also gives a strange and artificial "
-            "feeling. Instead of being purely cheerful, the pink makes the environment feel controlled and "
-            "almost dreamlike.",
-        ),
         'yellow': (
             "Cinematic Emotion",
             "The yellow adds warmth and brightness to the scene. It feels energetic and eye-catching, "
             "creating contrast with the pink. However, in this setting, the yellow also adds tension because "
             "it makes the space feel exposed and intense rather than calm. It brings a sense of alertness "
             "instead of comfort.",
+        ),
+        'pink': (
+            "Cinematic Emotion",
+            "The pink color creates a soft but slightly surreal atmosphere. It feels playful and sweet "
+            "at first, but because it covers large areas of the scene, it also gives a strange and artificial "
+            "feeling. Instead of being purely cheerful, the pink makes the environment feel controlled and "
+            "almost dreamlike.",
         ),
     },
 
