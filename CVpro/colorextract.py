@@ -26,8 +26,8 @@ class ColorConfig:
         'purple': {
             'display_name': 'Pink',
             'button_color': '#E91E63', 
-            'hsv_lower_bound': np.array([120, 10, 10]),  # Very broad range to catch any pink/purple/red tones
-            'hsv_upper_bound': np.array([180, 255, 255]) # Maximum range for pink spectrum
+            'hsv_lower_bound': np.array([140, 30, 80]),  # Narrower range for true pink tones only
+            'hsv_upper_bound': np.array([175, 255, 255]) # Focused pink/magenta spectrum
         },
         'blue': {
             'display_name': 'Blue',
