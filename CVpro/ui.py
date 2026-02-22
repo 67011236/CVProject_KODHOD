@@ -401,6 +401,7 @@ class ColorExtractionUI:
         self.extraction_page_frame.pack(fill='both', expand=True)
 
         _refs = {}; _result = {}
+        _fcfg = get_image_config(image_path)
 
         # ── Header ────────────────────────────────────────────────────────
         hdr = tk.Frame(self.extraction_page_frame, bg=BG_HEADER, height=60)
@@ -470,10 +471,11 @@ class ColorExtractionUI:
 
         ff = tk.Frame(bar, bg='#000000')
         ff.place(relx=0.5, rely=0.5, anchor='center')
+        _allowed_fc = _fcfg.get('filter_colors')   # list or None
         for fk, fi in self.color_filters.items():
-            if idx == 3 and fk == 'yellow':
+            if _allowed_fc is not None and fk not in _allowed_fc:
                 continue
-            if idx != 3 and fk == 'blue':
+            if _allowed_fc is None and fk == 'blue':
                 continue
             tk.Button(ff, text=fi['display_name'],
                       font=(FONT, 11, 'bold'), bg=fi['button_color'], fg='white',
