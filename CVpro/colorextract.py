@@ -20,8 +20,8 @@ class ColorConfig:
         'green': {
             'display_name': 'Green',
             'button_color': '#4CAF50',
-            'hsv_lower_bound': np.array([40, 50, 50]),   # Lower HSV threshold
-            'hsv_upper_bound': np.array([80, 255, 255])  # Upper HSV threshold
+            'hsv_lower_bound': np.array([35, 20, 20]),   # ขยายช่วงเพื่อจับสีเขียวทุกเฉด (อ่อน-เข้ม)
+            'hsv_upper_bound': np.array([85, 255, 255])  # รวมเขียวเหลือง เขียวน้ำเงิน
         },
         'purple': {
             'display_name': 'Purple',
@@ -46,6 +46,14 @@ class ColorConfig:
             'button_color': '#FFEB3B',
             'hsv_lower_bound': np.array([10, 50, 50]),     # Wider hue range, lower saturation threshold
             'hsv_upper_bound': np.array([40, 255, 255])    # Extended to include yellow-orange tones
+        },
+        'red': {
+            'display_name': 'Red',
+            'button_color': '#f44336',
+            'hsv_lower_bound': np.array([0, 50, 50]),      # Lower red range (0-10 degrees)
+            'hsv_upper_bound': np.array([10, 255, 255]),   # Upper bound for lower range
+            'hsv_lower_bound_2': np.array([170, 50, 50]),  # Upper red range start (170-180 degrees)
+            'hsv_upper_bound_2': np.array([180, 255, 255]) # Upper red range end
         }
     }
     
@@ -114,6 +122,13 @@ def extract_color(image, hsv_image, color_key):
     
     # Generate color mask
     mask = cv2.inRange(hsv_image, lower_hsv, upper_hsv)
+    
+    # Special handling for red color (which wraps around HSV hue spectrum)
+    if 'hsv_lower_bound_2' in color_info and 'hsv_upper_bound_2' in color_info:
+        lower_hsv_2 = color_info['hsv_lower_bound_2']
+        upper_hsv_2 = color_info['hsv_upper_bound_2']
+        mask2 = cv2.inRange(hsv_image, lower_hsv_2, upper_hsv_2)
+        mask = cv2.bitwise_or(mask, mask2)
     
     # Clean up the mask using morphological operations
     mask = clean_mask(mask)
