@@ -50,9 +50,9 @@ class ColorConfig:
         'red': {
             'display_name': 'Red',
             'button_color': '#f44336',
-            'hsv_lower_bound': np.array([0, 50, 50]),      # Lower red range (0-10 degrees)
-            'hsv_upper_bound': np.array([10, 255, 255]),   # Upper bound for lower range
-            'hsv_lower_bound_2': np.array([170, 50, 50]),  # Upper red range start (170-180 degrees)
+            'hsv_lower_bound': np.array([0, 80, 80]),      # Higher saturation/value for bright flames only
+            'hsv_upper_bound': np.array([12, 255, 255]),   # Narrower hue range for fire/candles
+            'hsv_lower_bound_2': np.array([168, 80, 80]),  # Higher threshold to avoid ground reds
             'hsv_upper_bound_2': np.array([180, 255, 255]) # Upper red range end
         }
     }

@@ -10,7 +10,7 @@ CONFIG = {
     'extract_colors': ['black', 'red'],
 
     # ── Filter (Change Mood) page: which filter buttons to show ──────────────
-    'filter_colors': ['red', 'yellow', 'gray'],
+    'filter_colors': ['red', 'blue', 'yellow'],
 
     # ── Cinematic descriptions for each extraction color ─────────────────────
     'extract_descriptions': {
@@ -34,21 +34,21 @@ CONFIG = {
     'filter_descriptions': {
         'red': (
             "Cinematic Emotion",
-            "The red filter intensifies the ritualistic atmosphere, making the warm candle glow "
-            "appear more dramatic and ceremonial. It enhances the sense of forbidden ritual and "
-            "adds intensity to the mysterious gathering around the skull.",
+            "The red color would make the scene feel more intense, dangerous, and dramatic. It would "
+            "increase the sense of fear and tension, making the ritual-like setting look more "
+            "aggressive and threatening, as if something powerful or violent is about to happen.",
+        ),
+        'blue': (
+            "Cinematic Emotion",
+            "The blue color would make the scene feel colder, darker, and more mysterious. It would "
+            "reduce warmth from the candles and create a calm but eerie mood, making the place seem "
+            "more secretive and supernatural.",
         ),
         'yellow': (
             "Cinematic Emotion",
-            "The yellow filter brightens the scene with golden warmth, transforming the eerie "
-            "candlelight into a more prominent feature. It creates a focus on the central elements "
-            "while maintaining the mysterious and ceremonial mood of the gathering.",
-        ),
-        'gray': (
-            "Cinematic Emotion",
-            "The grayscale filter removes all warmth and color, creating a cold, stark atmosphere "
-            "that emphasizes the ominous nature of the scene. It makes the ritual appear more "
-            "serious and foreboding, focusing purely on the dramatic composition.",
+            "The yellow color would make the scene brighter but still tense. It would highlight the "
+            "candles and main object more, giving the scene a ritual and focused feeling, as if an "
+            "important ceremony is taking place while still keeping a serious and suspenseful tone.",
         ),
     },
 }
