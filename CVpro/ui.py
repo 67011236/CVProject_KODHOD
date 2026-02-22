@@ -17,6 +17,8 @@ from datetime import datetime
 
 # Import our color processing module
 from colorextract import extract_color, apply_color_filter, get_extraction_colors, get_color_filters
+# Import per-image configuration (one file per image, no git conflicts)
+from image_configs import get_image_config
 
 # ============================================================================
 #                        DESIGN TOKENS  (single source of truth)
@@ -437,7 +439,21 @@ class ColorExtractionUI:
                            font=(FONT, 10, 'italic'), fg=TEXT_HINT, anchor='center')
         res_lbl.grid(row=1, column=0, sticky='nsew', padx=10, pady=(0, 12))
 
-        # ── Status ─────────────────────────────────────────────────────────
+        # ── Cinematic description card (filter page) ──────────────────────
+        desc_card_f = tk.Frame(res_outer, bg='#141414')
+        desc_card_f.grid(row=2, column=0, sticky='ew', padx=12, pady=(0, 14))
+        desc_card_f.columnconfigure(0, weight=1)
+        tk.Frame(desc_card_f, bg=ACCENT, height=3).grid(row=0, column=0, sticky='ew')
+        inner_f = tk.Frame(desc_card_f, bg='#141414')
+        inner_f.grid(row=1, column=0, sticky='ew', padx=20, pady=16)
+        inner_f.columnconfigure(0, weight=1)
+        desc_title_f = tk.Label(inner_f, text='', bg='#141414', fg='white',
+                                font=(FONT, 13, 'bold'), anchor='w', justify='left')
+        desc_title_f.grid(row=0, column=0, sticky='ew', pady=(0, 10))
+        desc_body_f = tk.Label(inner_f, text='', bg='#141414', fg='#e0e0e0',
+                               font=(FONT, 11), anchor='w', justify='left', wraplength=520)
+        desc_body_f.grid(row=1, column=0, sticky='ew')
+        desc_card_f.grid_remove()
         sv = tk.StringVar(value="Select a filter to apply")
         tk.Label(self.extraction_page_frame, textvariable=sv,
                  font=(FONT, 9), bg=BG_DARK, fg=TEXT_HINT).pack(pady=2)
@@ -455,6 +471,10 @@ class ColorExtractionUI:
         ff = tk.Frame(bar, bg='#000000')
         ff.place(relx=0.5, rely=0.5, anchor='center')
         for fk, fi in self.color_filters.items():
+            if idx == 3 and fk == 'yellow':
+                continue
+            if idx != 3 and fk == 'blue':
+                continue
             tk.Button(ff, text=fi['display_name'],
                       font=(FONT, 11, 'bold'), bg=fi['button_color'], fg='white',
                       width=15, padx=4, pady=6, relief='flat', cursor='hand2', bd=0,
@@ -477,6 +497,8 @@ class ColorExtractionUI:
 
         _refs['orig'] = _render(original, orig_lbl)
 
+        _filter_descs = _fcfg.get('filter_descriptions', {})
+
         def _do_filter(fk):
             fi = self.color_filters[fk]
             sv.set(f"Applying {fi['display_name']}\u2026")
@@ -487,6 +509,14 @@ class ColorExtractionUI:
                 _refs['res'] = _render(result, res_lbl)
                 res_title_var.set(name)
                 sv.set(f"{name} applied")
+                entry = _filter_descs.get(fk)
+                if entry:
+                    title, body = entry
+                    desc_title_f.config(text=title)
+                    desc_body_f.config(text=body)
+                    desc_card_f.grid()
+                else:
+                    desc_card_f.grid_remove()
             except Exception as e:
                 sv.set(f"Error: {e}")
 
@@ -585,8 +615,12 @@ class ColorExtractionUI:
 
         colors_center = tk.Frame(bottom, bg='#000000')
         colors_center.place(relx=0.5, rely=0.5, anchor='center')
+        _ecfg = get_image_config(image_path)
+        _allowed_ec = _ecfg.get('extract_colors')   # list or None
         for ck, ci in self.extraction_colors.items():
-            if idx == 0 and ck == 'blue':
+            if _allowed_ec is not None and ck not in _allowed_ec:
+                continue
+            if _allowed_ec is None and ck == 'black':   # hide black unless explicitly listed
                 continue
             tk.Button(colors_center,
                       text=f"\u25cf {ci['display_name']}",
@@ -614,20 +648,7 @@ class ColorExtractionUI:
 
         _refs['orig'] = _render(original, orig_lbl)
 
-        # Cinematic descriptions per image index and color
-        # Format: (title, body)
-        DESCRIPTIONS = {
-            0: {
-                'green':  ("Cinematic Emotion",
-                           "This unnatural green shade represents the character's detachment from society. "
-                           "It creates a sense of unease and isolation, highlighting a world where the individual "
-                           "feels like an outsider in their own environment."),
-                'purple': ("Cinematic Emotion",
-                           "A somber, low-luminance tone that evokes a feeling of nostalgia and loneliness. "
-                           "When paired with green, it creates visual tension that reflects the quiet sadness "
-                           "and solitude of life in a vast, empty city."),
-            },
-        }
+        _extract_descs = _ecfg.get('extract_descriptions', {})
 
         def _do_extract(color_key):
             ci = self.extraction_colors[color_key]
@@ -640,7 +661,7 @@ class ColorExtractionUI:
                 res_title_var.set(f"{name} \u2014 Extracted")
                 status_var.set(f"{name} extracted successfully")
                 # Show cinematic description card if available
-                entry = DESCRIPTIONS.get(idx, {}).get(color_key)
+                entry = _extract_descs.get(color_key)
                 if entry:
                     title, body = entry
                     desc_title_lbl.config(text=title)

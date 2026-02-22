@@ -34,6 +34,12 @@ class ColorConfig:
             'button_color': '#2196F3',
             'hsv_lower_bound': np.array([100, 50, 50]),
             'hsv_upper_bound': np.array([130, 255, 255])
+        },
+        'black': {
+            'display_name': 'Black',
+            'button_color': '#333333',
+            'hsv_lower_bound': np.array([0, 0, 0]),
+            'hsv_upper_bound': np.array([180, 255, 50])
         }
     }
     
@@ -57,6 +63,13 @@ class ColorConfig:
             'display_name': 'Grayscale Filter',
             'button_color': '#9E9E9E',
             'type': 'grayscale'        # Special grayscale conversion
+        },
+        'blue': {
+            'display_name': 'Blue Filter',
+            'button_color': '#1565C0',
+            'blue_multiplier': 1.8,    # Enhance blue channel
+            'green_multiplier': 0.6,   # Reduce green
+            'red_multiplier': 0.5      # Reduce red
         }
     }
     
