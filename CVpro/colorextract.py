@@ -24,10 +24,10 @@ class ColorConfig:
             'hsv_upper_bound': np.array([85, 255, 255])  # รวมเขียวเหลือง เขียวน้ำเงิน
         },
         'purple': {
-            'display_name': 'Pink',
-            'button_color': '#E91E63', 
-            'hsv_lower_bound': np.array([140, 30, 80]),  # Narrower range for true pink tones only
-            'hsv_upper_bound': np.array([175, 255, 255]) # Focused pink/magenta spectrum
+            'display_name': 'Purple',
+            'button_color': '#673AB7', 
+            'hsv_lower_bound': np.array([120, 15, 30]),  # Broader range to include background purple tones
+            'hsv_upper_bound': np.array([180, 255, 255]) # Extended to capture all purple/violet background areas
         },
         'blue': {
             'display_name': 'Blue',

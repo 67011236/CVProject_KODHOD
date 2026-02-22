@@ -264,14 +264,14 @@ class ColorExtractionUI:
         BORDER_GREEN  = '#2ecc71'
         BORDER_ORANGE = '#e07020'
         _GLOW_PAD     = 10                 # must match GLOW_LAYERS+2 inside _make_card
-        IMG_W         = (CARD_W + _GLOW_PAD * 2) * 2 + 64   # spans both glow canvases + padx
+        IMG_W         = (CARD_W + _GLOW_PAD * 2) * 2 + 16   # Slightly narrower: reduced spacing
 
         # Preview thumbnail — sized to span both cards
         tk.Label(center, text=f"IMAGE {idx + 1}",
                  font=(FONT, 13, 'bold'), bg=BG_DARK, fg=TEXT_PRI).pack(pady=(0, 8))
         rgb = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
         h2, w2 = rgb.shape[:2]
-        sc = min(IMG_W / w2, 240 / h2, 1.0)
+        sc = min(IMG_W / w2, 320 / h2, 1.0)  # Increased height limit from 240 to 320
         rgb = cv2.resize(rgb, (int(w2 * sc), int(h2 * sc)))
         # Pad to exact IMG_W so image always fills the full width
         canvas_img = Image.new('RGB', (IMG_W, int(h2 * sc)),
