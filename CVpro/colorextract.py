@@ -26,8 +26,8 @@ class ColorConfig:
         'purple': {
             'display_name': 'Pink',
             'button_color': '#E91E63', 
-            'hsv_lower_bound': np.array([125, 30, 30]),  # ขยายช่วงเพื่อจับสีม่วงทุกเฉดให้ชัดเจน
-            'hsv_upper_bound': np.array([165, 255, 255]) # ครอบคลุมทั้งม่วงแดงและม่วงน้ำเงิน
+            'hsv_lower_bound': np.array([120, 10, 10]),  # Very broad range to catch any pink/purple/red tones
+            'hsv_upper_bound': np.array([180, 255, 255]) # Maximum range for pink spectrum
         },
         'blue': {
             'display_name': 'Blue',
@@ -44,8 +44,8 @@ class ColorConfig:
         'yellow': {
             'display_name': 'Yellow',
             'button_color': '#FFEB3B',
-            'hsv_lower_bound': np.array([10, 50, 50]),     # Wider hue range, lower saturation threshold
-            'hsv_upper_bound': np.array([40, 255, 255])    # Extended to include yellow-orange tones
+            'hsv_lower_bound': np.array([15, 30, 40]),     # Broader range for golden background areas
+            'hsv_upper_bound': np.array([45, 255, 255])    # Extended to capture all gold/yellow background tones
         },
         'red': {
             'display_name': 'Red',
@@ -54,6 +54,12 @@ class ColorConfig:
             'hsv_upper_bound': np.array([12, 255, 255]),   # Narrower hue range for fire/candles
             'hsv_lower_bound_2': np.array([168, 80, 80]),  # Higher threshold to avoid ground reds
             'hsv_upper_bound_2': np.array([180, 255, 255]) # Upper red range end
+        },
+        'white': {
+            'display_name': 'White/Cream',
+            'button_color': '#FAFAFA',
+            'hsv_lower_bound': np.array([0, 0, 180]),      # Lower brightness to catch cream tones in clothes
+            'hsv_upper_bound': np.array([180, 40, 255])    # Slightly higher saturation for fabric textures
         }
     }
     
